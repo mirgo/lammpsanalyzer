@@ -1,11 +1,11 @@
 # lammpsanalyzer
 
-## description
+## Description
 
 This repo contains files designed to parse through LAMMPS trajectory files, which contain
 information on molecule positions over a series of timesteps.
 
-[LAMMPS!](https://www.lammps.org/) is a molecule simulator, taking in structures of
+[LAMMPS](https://www.lammps.org/) is a molecule simulator, taking in structures of
 molecules and allowing simulations under a variety of completely customizable conditions
 (ex., implementing Lennard-Jones potential, and such).
 
@@ -38,7 +38,7 @@ cd /lammpsanalyzer
 3. Install pip and prerequisite packages.
 ```
 sudo install pip
-pip install numpy matplotlib argparse tqdm
+pip install numpy matplotlib argparse tqdm gif pillow peakutils moviepy
 ```
 
 ## Execution

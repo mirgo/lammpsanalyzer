@@ -1,7 +1,6 @@
 import numpy as np
-import tqdm
-import re
 import matplotlib.pyplot as plt
+import PIL, gif, re, tqdm
 
 # Reformat lammpstrj script into numpy matrix of positions
 # Matrix width 3 for x,y,z coordinates
@@ -36,9 +35,9 @@ def readlammpstrjpositions(fileloc):
     # Return matrix
     return np.array(positions), natoms
 
-def rog(positions, natoms):
+def rog(positionarray, natoms):
     rogs = []
-    mat = positions
+    mat = positionarray
     # Chunking position block into each timestep
     for i in tqdm.tqdm(range(int(len(mat)/natoms))):
         allr = []
@@ -71,3 +70,60 @@ def avdis(positionarray, numberofatoms):
         # Record average of all those displacements
         avgdp.append(np.average(displacements))
     return avgdp
+
+# Covariance matrix between the movements of atoms among 3 timesteps (for two displacements)
+def movementcovariancematrix(firstarray, secondarray):
+    compiled = np.array([firstarray, secondarray])
+    # Transposing matrix before calculating covariance to get atoms*atoms dimensions
+    return np.cov(compiled.T, bias=False)
+
+# Animated Covariance Matrix for Movement, either gif or mp4 expression
+def animatedmovementcovmat(positionarray, natoms, giformp4):
+    '''
+    giformp4: 0 for gif, 1 for mp4
+    '''
+    movements = []
+    pos = positionarray
+    @gif.frame
+    # Plot function describes how each frame is made, and employs decorator later
+    def plot(i, positions):
+        sequ = pos[i*natoms:(i+3)*natoms]
+        f = [] # first movements
+        s = [] # second movements
+        for j in range(natoms):
+            f.append(dist(sequ[j], sequ[j+natoms]))
+            s.append(dist(sequ[j+natoms], sequ[j+(natoms*2)]))
+        grid = movementcovariancematrix(f, s)
+        # Standardize the color bar representation
+        plt.imshow(grid, vmin=-4, vmax=4)
+        plt.colorbar()
+        # Reflect new timestep on each frame
+        plt.title(f'Movement Covariance Matrix, Timesteps {i} to {i+3}')
+    frames = []
+    nf = int(len(pos)/natoms)
+    # Number of frames dictated by length of position array divided by atoms
+    if giformp4 == 0:
+        # For gif, cap at 100 frames
+        desired = 100
+    else:
+        # For mp4, get all frames
+        desired = (nf)-2
+    for i in tqdm.tqdm(range(desired)):
+        frame = plot(i, pos)
+        frames.append(frame)
+    return frames
+
+# RMSD calculation
+def squaredisplacement(positions, atoms):
+    msds = []
+    pos = positions
+    # Chunk into timesteps-1, because displacements require 2 timesteps
+    for i in tqdm.tqdm(range(int((len(pos)/atoms)-1))):
+        displacements = []
+        # Take distance for each atom
+        for j in range(atoms):
+            displacements.append(dist(pos[j], pos[j+(i+1)*atoms]))
+        # Record average displacement
+        msds.append(np.average(displacements))
+    # Transform into root
+    return np.sqrt(np.array(msds))
