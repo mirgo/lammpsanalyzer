@@ -55,6 +55,10 @@ def rog(positionarray, natoms):
 def dist(f, s):
     return np.abs(np.sqrt(((f[0]-s[0])**2) + ((f[1]-s[1])**2) + ((f[2]-s[2])**2)))
 
+# Distance formula but 2D
+def dist2d(f, s):
+    return np.abs(np.sqrt(((f[0]-s[0])**2) + ((f[1]-s[1])**2)))
+
 # Average Displacement Per Atom Over Time
 def avdis(positionarray, numberofatoms):
     atoms = numberofatoms
@@ -127,3 +131,57 @@ def squaredisplacement(positions, atoms):
         msds.append(np.average(displacements))
     # Transform into root
     return np.sqrt(np.array(msds))
+
+# This function for identifying peaks from a 2d signal is adapted from
+# https://stackoverflow.com/questions/3684484/peak-detection-in-a-2d-array
+def detectpeaks(image):
+    from scipy.ndimage.filters import maximum_filter
+    from scipy.ndimage.morphology import generate_binary_structure, binary_erosion
+    neighborhood = generate_binary_structure(2,2)
+    local_max = maximum_filter(image, footprint=neighborhood)==image
+    background = (image==0)
+    eroded_background = binary_erosion(background, structure=neighborhood, border_value=1)
+    detected_peaks = local_max ^ eroded_background
+    return detected_peaks
+# End adapted function
+
+# Take 2D array (signal) and transform with a highpass filter to extract peaks
+def highpassidealfilter(cutoff, imageshape):
+    # Set shape of ones
+    base = np.ones(imageshape[:2])
+    rows, cols = imageshape[:2]
+    center = (rows/2, cols/2)
+    # For every pixel, check if it's less than cutoff difference
+    for x in range(cols):
+        for y in range(rows):
+            if dist2d((y,x), center) < cutoff:
+                base[y,x] = 0
+    return base
+
+def rollingpeakaverage(positions, atoms):
+    pos = positions
+    peakcounts = []
+    peakavgs = np.zeros(int((len(pos)/atoms)-2))
+    for i in tqdm.tqdm(range(int(len(pos)/atoms)-2)):
+        # Calculate distance covariance matrix to extract peaks
+        sequ = pos[i*atoms:(i+3)*atoms]
+        f = [] # first movements
+        s = [] # second movements
+        for j in range(atoms):
+            f.append(dist(sequ[j], sequ[j+atoms]))
+            s.append(dist(sequ[j+atoms], sequ[j+(atoms*2)]))
+        grid = (movementcovariancematrix(f, s))
+
+        # Fourier transformations for next several lines
+        centerft = np.fft.fftshift(np.fft.fft2(grid))
+        filtered = np.fft.ifftshift(centerft * highpassidealfilter(.005, grid.shape))
+        ifiltered = np.fft.ifft2(filtered)
+        realf = np.abs(ifiltered)
+        peakgrid = detectpeaks(realf)
+
+        # Count all the peaks and record
+        numpeaks = np.count_nonzero(peakgrid)
+        peakcounts.append(numpeaks)
+        # Rounding the average thus far to two decimal places
+        peakavgs[i] = (np.round(np.average(np.array(peakcounts)),2))
+    return peakavgs

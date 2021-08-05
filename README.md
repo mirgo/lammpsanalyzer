@@ -51,7 +51,7 @@ cd /lammpsanalyzer
 3. Install pip and prerequisite packages.
 ```
 sudo install pip
-pip install numpy matplotlib argparse tqdm gif pillow peakutils moviepy
+pip install numpy matplotlib argparse tqdm gif pillow peakutils moviepy scipy
 ```
 
 ## Execution
@@ -66,18 +66,19 @@ General execution follows the following format:
 usage: analyzer.py [-h] [-gyration] [-displacement] [-covariance formatinteger] [-rmsd] [-all] infile outfolder
 ```
 
-Where `infile` refers to the relative location for the input lammpstrj file, which should be (assuming you're in `/lammpsanalyzer`) in the `sampleinputs/` folder, corresponding either to `sampleinputs/sample24atoms.lammpstrj` or `sampleinputs/sample742atoms.lammpstrj`. It is required.
+Where `infile` refers to the relative location for the input lammpstrj file, which should be (assuming you're in `/lammpsanalyzer`) in the `sampleinputs/` folder, corresponding either to `sampleinputs/sample24atoms.lammpstrj` or `sampleinputs/sample742atoms.lammpstrj`. **It is required.**
 
-`outfolder` refers to the folder destination for the outputs desired. For each analysis indicated/flagged, there will be an output of some representation (i.e., a graph, gif, or mp4), that will have a name with the analysis (i.e., rsmd.png). It is required.
+`outfolder` refers to the folder destination for the outputs desired. For each analysis indicated/flagged, there will be an output of some representation (i.e., a graph, gif, or mp4), that will have a name with the analysis (i.e., rsmd.png). **It is required.**
 
 The following are optional arguments (at least 1 would be useful to be run):
 Analysis | Flag | Additional Notes
 --- | --- | ---
 Radius of Gyration | -gyration |
 Average Self-Displacement | -displacement |
-Distance Covariance Matrix | -covariance (followed by 0 or 1, more on that later) | Following with a 0 will create a GIF of the first 100 timesteps, to save memory. A 1 will create a MP4 of the entire simulation.
+Distance Covariance Matrix | -covariance (followed by 0 or 1) | Following with a 0 will create a GIF of the first 100 timesteps, to save memory. A 1 will create a MP4 of the entire simulation.
 Root Mean Square Displacement | -rmsd |
-**indicate all above analyses** | -all | Doesn't require any other flags to be indicated. Will not harm execution if so. Will produce 100 timestep GIF option for covariance.
+Distance Covariance Rolling Average Peak | -peakaverage |
+**Indicate all above analyses** | -all | Doesn't require any other flags to be indicated. Will not harm execution if so. Will produce 100 timestep GIF option for covariance.
 
 Some examples with `sampleinputs/sample24atoms.lammpstrj` as infile and `output24` as outfolder:
 
@@ -91,13 +92,37 @@ python3 analyzer.py -all sampleinputs/sample24atoms.lammpstrj output24
 python3 analyzer.py -gyration -rmsd sampleinputs/sample24atoms.lammpstrj output24
 ```
 
-3. To run just distance covariance matrix as mp4
+3. To run just distance covariance matrix as mp4:
 ```
 python3 analyzer.py -covariance 1 sampleinputs/sample24atoms.lammpstrj output24
 ```
 
-
 ### Analyses Available
 
+- Radius of Gyration
+
+Describes the root mean square distance aggregate of all atoms from the center of mass for the molecule. Higher values indicate a more spread out polymer, while lower values indicate a more bundled-up, compact molecule.
+
+- Average Self-Displacement
+
+Takes the displacement of atoms through every timestep, averages per timestep, and outputs over time. Higher values indicate a molecule moving rapidly, while lower values descibe a less-fluctuating molecule (typically high suspension or compact conditions).
+
+- Distance Covariance Matrix
+
+Describes the association of movement for atoms between each other through every timestep. Higher values describe relational (similar) movement, while lower values describe limited association.
+
+- Root Mean Square Displacement
+
+Describes the movement of the molecule. Hails from Brownian random motion and diffusion.
+
+- Distance Covariance Rolling Average Peak
+
+An additional measure to the distance covariance matrix, but identifying and quantifying peaks - which would be bundles where a lot of atoms are moving in unison.
 
 ## References
+
+- https://realpython.com/python-scipy-fft/
+- https://en.wikipedia.org/wiki/Mean_squared_displacement
+- https://docs.lammps.org/compute.html
+- https://towardsdatascience.com/basics-of-gifs-with-pythons-matplotlib-54dd544b6f30
+- https://datascienceplus.com/understanding-the-covariance-matrix/

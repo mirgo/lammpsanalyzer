@@ -41,7 +41,9 @@ All of the calculations for these analyses follow mathematical formulas describe
 - [Root mean sqaure distance](https://en.wikipedia.org/wiki/Mean_squared_displacement)
 - [Fourier transform](https://numpy.org/doc/stable/reference/routines.fft.html#implementation-details)
 
-And for efficient computing, most data transformations were done through numpy functions. 
+Many of the analyses use these component formulas, along with other more minor additions and calculations I designed originally.
+
+And for efficient computing, most data transformations were done through numpy functions.
 
 ## Algorithm Design
 

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import argparse, tqdm, sys, re, os, gif
 import moviepy.editor as mp
 
-from supplementary import readlammpstrjpositions, rog, avdis, animatedmovementcovmat, squaredisplacement
+from supplementary import readlammpstrjpositions, rog, avdis, animatedmovementcovmat, squaredisplacement, rollingpeakaverage
 
 # Command Line Guide and Information
 parser = argparse.ArgumentParser(description='Take in a LAMMPSTRJ file and output a variety of analyses.', epilog='Created July 31, 2021. Hope it helps! - Mihir')
@@ -16,6 +16,7 @@ parser.add_argument('-gyration', action='store_true', help='radius of gyration c
 parser.add_argument('-displacement', action='store_true', help='average self-displacement calculation. Will output chart over timesteps.')
 parser.add_argument('-covariance', type=int, metavar='formatinteger', help='distance covariance matrix. Will output either gif or mp4 illustrating movment covariance matrices over timesteps. For format enter 0 for "gif" or non-0 for "mp4". NOTE: "gif" option saves first 100 iterations, to keep it short. "MP4" takes all information.')
 parser.add_argument('-rmsd', action='store_true', help='root mean square displacement calculation. Will output chart over timesteps.')
+parser.add_argument('-peakaverage', action='store_true', help='distance covariance rolling average peak calculation. Will output chart over timesteps.')
 
 parser.add_argument('-all', action='store_true', help='indicate ALL analyses to be outputted.')
 
@@ -89,4 +90,14 @@ if args.rmsd or args.all:
     plt.ylabel('RMSD')
     plt.savefig(args.outfolder + '/rmsd.png')
     print('RMSD Computed and Saved!')
+    plt.clf()
+
+if args.peakaverage or args.all:
+    tt = len(range(int(len(pos)/natoms)-2))
+    plt.plot(np.linspace(1, tt, tt), rollingpeakaverage(pos, natoms))
+    plt.title('Rolling Peak Average over Time')
+    plt.xlabel('Timestep')
+    plt.ylabel('Average Peak Count')
+    plt.savefig(args.outfolder + '/rollingpeakavg.png')
+    print('Rolling Peak Average of Distance Covariance Computed and Saved!')
     plt.clf()
