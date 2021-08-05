@@ -5,7 +5,7 @@
 This repo contains files designed to parse through LAMMPS trajectory files, which contain
 information on molecule positions over a series of timesteps.
 
-**[Link to Short Video Description](https://youtu.be/H2jwzjH7r2Y)** 
+**[Link to Short Video Description](https://youtu.be/H2jwzjH7r2Y)**
 
 [LAMMPS](https://www.lammps.org/) is a molecule simulator, taking in structures of
 molecules and allowing simulations under a variety of completely customizable conditions
@@ -27,7 +27,7 @@ A lammpstrj file, also known as a LAMMPS trajectory file, describes the movement
 There are two sample files, which have greatly different sizes, and so execution time will differ between them, which is why I appended a loading bar to the executable.
 
 Input file | Number of Atoms | Timesteps | *n* Steps
---- | --- | ---
+--- | --- | --- | ---
 `sample24atoms.lammpstrj` | 24 | 500 | 12000
 `sample724atoms.lammpstrj` | 724 | 2000 | 1448000
 
