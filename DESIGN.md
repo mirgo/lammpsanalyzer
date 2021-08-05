@@ -55,3 +55,5 @@ The following functions are in supplementary.py.
 >*rog* utilizes numpy `np.average` function to bring that calculation speed closer to C code execution. Numpy position matrix iterated through once.
 
 >*movementcovariancematrix* utilizes all commands through numpy for covariance and linear algebra operations.
+
+>*rollingpeakaverage* utilizes many functions for quick Fourier transformations, which would've been heavily complicated otherwise, through numpy.fft libary. Peakaverage predesignated amount of memory. 
