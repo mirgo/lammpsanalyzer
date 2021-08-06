@@ -18,7 +18,7 @@ of the trajectories of these molecules, to give insight to multiple features.
 
 Take a look at `sampleinputs/sample24atoms.lammpstrj` to get a view! The other file might be too large to look at.
 
-A lammpstrj file, also known as a LAMMPS trajectory file, describes the movement of a molecule over a set amount of timesteps, and classifies those movements with a series of x,y,z coordinates (per atom). You can probably imagine as timesteps and atoms increase, the complexity of the problem increases, as there are *n = timestep*atoms* iterations to go through.
+A lammpstrj file, also known as a LAMMPS trajectory file, describes the movement of a molecule over a set amount of timesteps, and classifies those movements with a series of x,y,z coordinates (per atom). You can probably imagine as timesteps and atoms increase, the complexity of the problem increases, as there are *n = timestep x atoms* iterations to go through.
 
 ## Navigation
 
